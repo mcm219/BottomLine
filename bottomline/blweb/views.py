@@ -5,5 +5,4 @@ from django.http import HttpRequest
 
 # Create your views here.
 def index(request):
-    return HttpResponse("Welcome to BottomLine! (Account App)")
-
+    return HttpResponse('Welcome to BottomLine landing page!')
