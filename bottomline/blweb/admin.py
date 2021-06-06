@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from blweb.models import VehicleModel, VehicleOption, VehicleMake
+
+admin.site.register(VehicleModel)
+admin.site.register(VehicleMake)
+admin.site.register(VehicleOption)
+
