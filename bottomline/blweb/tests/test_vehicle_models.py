@@ -66,7 +66,7 @@ class TestVehicleModel(TestCase):
         pass
 
 
-# VehicleModel CRUD tests
+# VehicleOptions CRUD tests
 class TestVehicleOptions(TestCase):
     # set up the environment
     def setUp(self):
