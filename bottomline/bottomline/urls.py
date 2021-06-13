@@ -19,5 +19,5 @@ import blweb.views
 
 urlpatterns = [path('accounts/', include(('django.contrib.auth.urls', 'auth'), namespace='accounts')),
                path('admin/', admin.site.urls),
-               path('', blweb.views.index),
+               path('', include('blweb.urls')),
                ]
