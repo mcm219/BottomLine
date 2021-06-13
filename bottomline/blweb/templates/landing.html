@@ -16,6 +16,13 @@
     <h1>Welcome to BottomLine!</h1>
     {% block content %}
     Choose between {{ count_info.makes }} makes and {{ count_info.models }} models for your next vehicle!
+
+    {% url 'accounts:login' as login_page %}
+    <div>
+        <a href="{{ login_page }}">Login</a>
+    </div>
+
     {% endblock %}
+
 </body>
 </html>
