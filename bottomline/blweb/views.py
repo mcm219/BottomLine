@@ -12,3 +12,8 @@ def index(request):
 
     context = {'count_info': count_info}
     return render(request, 'landing.html', context=context)
+
+
+def profile(request):
+    return render(request, 'profile.html')
+
