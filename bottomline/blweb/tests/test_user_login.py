@@ -25,9 +25,15 @@ class TestUserLogin(TestCase):
         response = self.client.get('/accounts/profile/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    # check that bad credentials fail log in
-    def test_user_log_in_fail(self):
+    # check that bad credentials fail log in (user)
+    def test_user_log_in_fail_user(self):
         login = self.client.login(username='baduser', password='test@#628password')
+        response = self.client.get('/accounts/profile/')
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+
+    # check that bad credentials fail log in (password)
+    def test_user_log_in_fail_password(self):
+        login = self.client.login(username='testuser', password='1234BadPassword!!')
         response = self.client.get('/accounts/profile/')
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
