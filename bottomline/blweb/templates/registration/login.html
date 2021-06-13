@@ -43,7 +43,7 @@
 </p>
 {% endif %}
 
-<form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+<form action="{% url 'accounts:login' %}" method="post" id="login-form">{% csrf_token %}
   <div class="form-row">
     {{ form.username.errors }}
     {{ form.username.label_tag }} {{ form.username }}
@@ -53,7 +53,7 @@
     {{ form.password.label_tag }} {{ form.password }}
     <input type="hidden" name="next" value="{{ next }}">
   </div>
-  {% url 'admin_password_reset' as password_reset_url %}
+  {% url 'accounts:password_reset' as password_reset_url %}
   {% if password_reset_url %}
   <div class="password-reset-link">
     <a href="{{ password_reset_url }}">{% translate 'Forgotten your password or username?' %}</a>
