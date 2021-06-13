@@ -2,5 +2,13 @@ from django.shortcuts import render
 
 
 # Create your views here.
+from blweb import utils
+
+
 def index(request):
-    return render(request, 'landing.html')
+    count_info = {}
+    count_info['makes'] = utils.get_make_count()
+    count_info['models'] = utils.get_model_count()
+
+    context = {'count_info': count_info}
+    return render(request, 'landing.html', context=context)
