@@ -1,28 +1,83 @@
-<!DOCTYPE html>
+{% comment %}MIT License
+
+Copyright (c) 2020 Packt
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.{% endcomment %}
+
+
+<!doctype html>
 {% load static %}
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1, shrink-to-fit=no">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet"
-          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-          crossorigin="anonymous">
-    <title>BottomLine</title>
-</head>
-<body>
-    <h1>Welcome to BottomLine!</h1>
-    {% block content %}
-    Choose between {{ count_info.makes }} makes and {{ count_info.models }} models for your next vehicle!
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-    {% url 'accounts:login' as login_page %}
-    <div>
-        <a href="{{ login_page }}">Login</a>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <title>BottomLine Home</title>
+    <style type="text/css">
+      .navbar {
+        min-height: 100px;
+        font-size: 25px;
+      }
+      .navbar-brand {
+        font-size: 25px;
+      }
+    </style>
+  </head>
+  <body>
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky-top">
+          <a class="navbar-brand" href="/">BottomLine</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="/vehicleconfig/">Configure Vehicle <span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/accounts/logout/">Logout</a>
+              </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+          </div>
+        </nav>
+         {% block content %}
+        <h1>Welcome to BottomLine!</h1>
+             Choose between {{ count_info.makes }} makes and {{ count_info.models }} models for your next vehicle!
+        {% endblock %}
+  <!-- Copyright -->
+  <footer class="page-footer font-small blue">
+    <div class="footer-copyright text-center py-3">© 2021 Copyright:
+      <a href="https://www.example.com"> BottomLine Media</a>
+      <p>Website by: BottomLine Media, inc.</p>
+      <p>Contact information: <a href="mailto:email@example.com">email@example.com</a></p>
     </div>
-
-    {% endblock %}
-
-</body>
+  </footer>
+  <!-- Copyright -->
+  </body>
 </html>
