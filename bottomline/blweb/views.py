@@ -17,3 +17,8 @@ def index(request):
 @login_required
 def profile(request):
     return render(request, 'profile.html')
+
+
+def account_signup(request):
+    return render(request, 'account_signup.html')
+
