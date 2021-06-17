@@ -22,3 +22,7 @@ def profile(request):
 def account_signup(request):
     return render(request, 'account_signup.html')
 
+
+def dealer_signup(request):
+    return render(request, 'dealer_signup.html')
+
