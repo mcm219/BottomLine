@@ -1,29 +1,23 @@
 from django import forms
 from enum import Enum
-from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 
 class AccountType(Enum):
     SHOPPER = 1
     DEALER = 2
+    ADMIN = 3
 
 
 # The superclass for the specific user signup forms (shopper and dealer)
-class SignupForm(forms.Form):
-    first_name = forms.CharField()
-    last_name = forms.CharField()
-    password = forms.CharField(widget=forms.PasswordInput, min_length=8)
-    confirm_password = forms.CharField(widget=forms.PasswordInput, min_length=8)
-    email = forms.EmailField()
+class SignupForm(UserCreationForm):
+    first_name = forms.CharField(max_length=30)
+    last_name = forms.CharField(max_length=30)
+    email = forms.EmailField(max_length=100)
     phone = forms.CharField(required=False)
-    account_type = None
 
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'phone', 'password1', 'password2')
 
-# add the fields specific to the customer
-class ShopperSignupForm(SignupForm):
-    account_type = AccountType.SHOPPER
-
-
-# add fields specific to the car dealer
-class DealerSignupForm(SignupForm):
-    account_type = AccountType.DEALER

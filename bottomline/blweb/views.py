@@ -1,9 +1,10 @@
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 # Create your views here.
 from blweb import utils
-from blweb.forms import ShopperSignupForm, DealerSignupForm
+from blweb.forms import AccountType, SignupForm
 
 
 # This is the view for the BottomLine main landing page. It renders the landing.html template
@@ -26,14 +27,20 @@ def profile(request):
 # create an account.
 def account_signup(request):
     if request.method == "POST":
-        form = ShopperSignupForm(request.POST)
+        form = SignupForm(request.POST)
     else:
-        form = ShopperSignupForm()
+        form = SignupForm()
 
     if form.is_valid():
-        for name, value in form.cleaned_data.items():
-            print("{}: ({}) {}".format(name, type(value), value))
-        print("Account Type: {}".format(form.account_type))
+        user = form.save()
+        user.refresh_from_db()
+        user.profile.account_type = AccountType.SHOPPER.value
+        user.save()
+
+        raw_password = form.cleaned_data.get('password1')
+        user = authenticate(username=user.username, password=raw_password)
+        login(request, user)
+
         return render(request, 'signup_success.html')
 
     return render(request, 'account_signup.html', {"method": request.method, "form": form})
@@ -43,14 +50,22 @@ def account_signup(request):
 # create an account.
 def dealer_signup(request):
     if request.method == "POST":
-        form = DealerSignupForm(request.POST)
+        form = SignupForm(request.POST)
     else:
-        form = DealerSignupForm()
+        form = SignupForm()
 
     if form.is_valid():
-        for name, value in form.cleaned_data.items():
-            print("{}: ({}) {}".format(name, type(value), value))
-        print("Account Type: {}".format(form.account_type))
+        user = form.save()
+        user_profile = user.profile
+        user.refresh_from_db()
+        user_profile.account_type = AccountType.DEALER.value
+        user.save()
+        user_profile.save()
+
+        raw_password = form.cleaned_data.get('password1')
+        user = authenticate(username=user.username, password=raw_password)
+        login(request, user)
+
         return render(request, 'signup_success.html')
 
     return render(request, 'dealer_signup.html', {"method": request.method, "form": form})
