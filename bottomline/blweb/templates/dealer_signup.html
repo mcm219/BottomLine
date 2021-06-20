@@ -3,8 +3,17 @@
 {% block content %}
 <h2>Dealer Registration</h2>
 <div>
-<p>
-Sign up for a new dealer account using the form fields below.
-</p>
+    <p>
+    Sign up for a new dealer account using the form fields below.
+    </p>
 </div>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p>
+        <button type="submit" name="button_element" value="Button Element">
+    Create Account!
+        </button>
+    </p>
+</form>
 {% endblock %}
