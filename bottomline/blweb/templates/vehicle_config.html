@@ -1,0 +1,19 @@
+{% extends "landing.html" %}
+{% block title %}BottomLine{% endblock %}
+{% block content %}
+<h2>Vehicle Config</h2>
+<div>
+<p>
+Start your new vehicle build here. First pick a make and model.
+</p>
+</div>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p>
+        <button type="submit" name="button_element" value="Button Element">
+    Next
+        </button>
+    </p>
+</form>
+{% endblock %}
