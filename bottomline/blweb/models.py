@@ -1,9 +1,15 @@
+from enum import Enum
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from blweb.forms import AccountType
+
+class AccountType(Enum):
+    SHOPPER = 1
+    DEALER = 2
+    ADMIN = 3
 
 
 class Profile(models.Model):
@@ -55,4 +61,3 @@ class VehicleOption(models.Model):
 
     def __str__(self):
         return self.name
-
