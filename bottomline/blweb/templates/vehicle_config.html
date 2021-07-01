@@ -9,7 +9,8 @@ Start your new vehicle build here. First pick a make and model.
 </div>
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ make_form.as_p }}
+    {{ model_form.as_p }}
     <p>
         <button type="submit" name="button_element" value="Button Element">
     Next

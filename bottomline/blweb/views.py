@@ -1,10 +1,11 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 # Create your views here.
 from blweb import utils
-from blweb.forms import SignupForm, VehicleConfigForm
+from blweb.forms import SignupForm, VehicleConfigForm, VehicleMakeForm, VehicleModelForm
 from blweb.models import AccountType
 
 
@@ -74,11 +75,47 @@ def dealer_signup(request):
     return render(request, 'dealer_signup.html', {"method": request.method, "form": form})
 
 
+# def vehicle_config(request):
+#     if request.method == "POST":
+#         #form = VehicleConfigForm(request.POST)
+#         form = VehicleMakeForm(request.POST)
+#         if form.is_valid():
+#             pass
+#             # get the make
+#             make = form.cleaned_data.get('name')
+#
+#             # now create a new form for the VehicleModel
+#             form = VehicleModelForm()
+#     else:
+#         form = VehicleMakeForm()
+#
+#     return render(request, 'vehicle_config.html', {"method": request.method, "form": form})
+
 def vehicle_config(request):
     if request.method == "POST":
-        form = VehicleConfigForm(request.POST)
-    else:
-        form = VehicleConfigForm()
+        make_form = VehicleMakeForm(request.POST)
+        model_form = VehicleModelForm(request.POST)
 
-    return render(request, 'vehicle_config.html', {"method": request.method, "form": form})
+        if make_form.is_valid() and model_form.is_valid():
+            # Get the make
+            make = make_form.cleaned_data.get('name')
+
+            # See if a model was selected
+            model = None
+
+
+            # both make and model have been specified, this is a success
+            # redirect to the next page for vehicle options
+            return HttpResponseRedirect('/vehicle_options')
+        elif make_form.is_valid() and not model_form.is_valid():
+            # user has selected a make and clicked 'next'
+            context = {'make_form': make_form, 'model_form': model_form}
+        else:
+            context = {'make_form': make_form}
+    else:
+        context = {
+            'make_form': VehicleMakeForm(),
+        }
+
+    return render(request, 'vehicle_config.html', context)
 
