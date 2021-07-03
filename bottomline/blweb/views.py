@@ -5,7 +5,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from blweb import utils
-from blweb.forms import SignupForm, VehicleConfigForm, VehicleMakeForm, VehicleModelForm
+from blweb.forms import SignupForm, VehicleConfigForm, VehicleMakeForm, VehicleModelForm, VehicleOptionsForm
 from blweb.models import AccountType
 
 
@@ -75,47 +75,61 @@ def dealer_signup(request):
     return render(request, 'dealer_signup.html', {"method": request.method, "form": form})
 
 
-# def vehicle_config(request):
-#     if request.method == "POST":
-#         #form = VehicleConfigForm(request.POST)
-#         form = VehicleMakeForm(request.POST)
-#         if form.is_valid():
-#             pass
-#             # get the make
-#             make = form.cleaned_data.get('name')
-#
-#             # now create a new form for the VehicleModel
-#             form = VehicleModelForm()
-#     else:
-#         form = VehicleMakeForm()
-#
-#     return render(request, 'vehicle_config.html', {"method": request.method, "form": form})
-
 def vehicle_config(request):
     if request.method == "POST":
-        make_form = VehicleMakeForm(request.POST)
-        model_form = VehicleModelForm(request.POST)
+        make_form = VehicleMakeForm(request.POST, prefix='make')
 
-        if make_form.is_valid() and model_form.is_valid():
+        if make_form.is_valid():
             # Get the make
             make = make_form.cleaned_data.get('name')
-
-            # See if a model was selected
-            model = None
-
+            print("Vehicle Make: ", make)
 
             # both make and model have been specified, this is a success
             # redirect to the next page for vehicle options
-            return HttpResponseRedirect('/vehicle_options')
-        elif make_form.is_valid() and not model_form.is_valid():
-            # user has selected a make and clicked 'next'
-            context = {'make_form': make_form, 'model_form': model_form}
+            response = HttpResponseRedirect('/vehicle_config_model')
+            response.set_cookie('VehicleMake', make)
+            return response
+
         else:
             context = {'make_form': make_form}
     else:
         context = {
-            'make_form': VehicleMakeForm(),
+            'make_form': VehicleMakeForm(prefix='make'),
         }
 
-    return render(request, 'vehicle_config.html', context)
+    return render(request, 'vehicle_config_make.html', context)
+
+
+def vehicle_config_model(request):
+
+    if request.method == "POST":
+        make = request.COOKIES['VehicleMake']
+        print("vehicle_config_model", make)
+        model_form = VehicleModelForm(request.POST, prefix='mod', chosen_make=make)
+
+        print("errors: ", model_form.errors)
+        print("non-field errors:", model_form.non_field_errors())
+
+        if model_form.is_valid():
+            # get the model
+            model = model_form.cleaned_data.get('name')
+            print("Vehicle Model: ", model)
+
+            return HttpResponseRedirect('/vehicle_config_options')
+        else:
+            context = {'model_form': model_form}
+    else:
+        #context = {'model_form': VehicleModelRegularForm()}
+        context = {'model_form': VehicleModelForm(prefix='mod')}
+
+    return render(request, 'vehicle_config_model.html', context)
+
+
+def vehicle_config_options(request):
+    if request.method == "POST":
+        options_form = VehicleOptionsForm(request.POST, prefix='options')
+    else:
+        context = {'options_form': VehicleOptionsForm(prefix='options')}
+
+    return render(request, 'vehicle_config_options.html', context)
 
