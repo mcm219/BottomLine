@@ -39,21 +39,44 @@ class TestVehicleConfig(TestCase):
         self.assertTemplateUsed(response, template_name='vehicle_config_make.html')
 
     # test a form post from the make page
-    # def test_vehicle_make_post(self):
-    #     response = self.client.post('/vehicle_config/', {'make-name': '51'}, follow=True)
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTemplateUsed(response, template_name='vehicle_config_model.html')
-    #
-    # # test good data in the VehicleMakeForm
-    def test_vehicle_make_form(self):
+    def test_vehicle_make_post(self):
+        # create a test make
+        make = VehicleMake.objects.create(
+            name='Ferrari',
+            website='www.ferrari.com',
+        )
 
+        response = self.client.post('/vehicle_config/', {'make-name': make.pk}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, template_name='vehicle_config_model.html')
+
+    # test a form post from the model page
+    def test_vehicle_model_post(self):
+        # first create a test make
+        make = VehicleMake.objects.create(
+            name='Ferrari',
+            website='www.ferrari.com',
+        )
+        # now a test model
+        model = VehicleModel.objects.create(
+            name='Roma',
+            year=2021,
+            make=make
+        )
+
+        self.client.cookies = SimpleCookie({'VehicleMake': 'Ferrari'})
+        response = self.client.post('/vehicle_config_model/', {'mod-name': model.pk}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, template_name='vehicle_config_options.html')
+
+    # test good data in the VehicleMakeForm
+    def test_vehicle_make_form(self):
         make = VehicleMake.objects.create(
             name='Ferrari',
             website='www.ferrari.com',
         )
 
         form = VehicleMakeForm({'name': make.pk})
-
         self.assertTrue(form.is_valid())
 
     # test bad data in the VehicleMakeForm

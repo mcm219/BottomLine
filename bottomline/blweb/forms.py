@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from blweb.models import VehicleMake, VehicleModel
+from blweb.models import VehicleMake, VehicleModel, VehicleOption
 
 
 # The superclass for the specific user signup forms (shopper and dealer)
@@ -80,9 +80,8 @@ class VehicleModelForm(forms.ModelForm):
             )
         return cleaned_data
 
-
-
-
 class VehicleOptionsForm(forms.ModelForm):
-    pass
+    class Meta:
+        model = VehicleOption
+        fields = ['name']
 
