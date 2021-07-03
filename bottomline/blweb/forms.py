@@ -36,7 +36,7 @@ class VehicleConfigForm(forms.Form):
 
 class VehicleMakeForm(forms.ModelForm):
 
-    name = forms.ModelChoiceField(queryset=VehicleMake.objects.all().order_by('name'))
+    name = forms.ModelChoiceField(queryset=VehicleMake.objects.all().order_by('name'), label='Vehicle Make')
 
     class Meta:
         model = VehicleMake
@@ -44,23 +44,45 @@ class VehicleMakeForm(forms.ModelForm):
 
 
 class VehicleModelForm(forms.ModelForm):
-    def __init__(self, chosen_make=None, *args, **kwargs):
-        super(VehicleModelForm, self).__init__(*args, **kwargs)
-        self.chosen_make = chosen_make
-
-    name = forms.ModelChoiceField(queryset=VehicleModel.objects.all().order_by('name'))
 
     class Meta:
         model = VehicleModel
         fields = ['name']
 
-    def clean(self):
-        cleaned_data = super().clean()
+    def __init__(self, *args, **kwargs):
 
+        self.chosen_make = kwargs.pop('chosen_make', None)
+        super(VehicleModelForm, self).__init__(*args, **kwargs)
+        if self.chosen_make is not None:
+            self.fields['name'].queryset = VehicleModel.objects.filter(make__name=self.chosen_make).order_by('name')
+        else:
+            self.fields['name'].queryset = VehicleModel.objects.distinct().order_by('name')
+
+    name = forms.ModelChoiceField(queryset=VehicleModel.objects.distinct().order_by('name'), label='Vehicle Model')
+
+    def save(self, **kwargs):
+        self.full_clean()
+        return super(VehicleModelForm, self).save(**kwargs)
+
+    def clean_name(self):
+        print("CLEAN NAME")
+        return self.cleaned_data['name']
+
+    def clean(self):
+        cleaned_data = super(VehicleModelForm, self).clean()
+
+        model_name = cleaned_data.get('name')
+        print('VehicleModelForm::clean: name: ', model_name)
         # check to see if this instance has an associated make
         if self.chosen_make is None:
             raise ValidationError(
-                "No VehicleMake associate with this instance."
+                "No VehicleMake associated with this instance."
             )
         return cleaned_data
+
+
+
+
+class VehicleOptionsForm(forms.ModelForm):
+    pass
 
