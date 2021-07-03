@@ -101,10 +101,11 @@ def vehicle_config(request):
 
 
 def vehicle_config_model(request):
+    make = request.COOKIES['VehicleMake']
+    print("vehicle_config_model", make)
 
     if request.method == "POST":
-        make = request.COOKIES['VehicleMake']
-        print("vehicle_config_model", make)
+
         model_form = VehicleModelForm(request.POST, prefix='mod', chosen_make=make)
 
         print("errors: ", model_form.errors)
@@ -119,8 +120,7 @@ def vehicle_config_model(request):
         else:
             context = {'model_form': model_form}
     else:
-        #context = {'model_form': VehicleModelRegularForm()}
-        context = {'model_form': VehicleModelForm(prefix='mod')}
+        context = {'model_form': VehicleModelForm(prefix='mod', chosen_make=make)}
 
     return render(request, 'vehicle_config_model.html', context)
 
