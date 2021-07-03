@@ -8,7 +8,7 @@ from django.urls import reverse
 
 
 # Test class for unit tests on the user login interface
-from blweb.forms import AccountType
+from blweb.models import AccountType
 
 
 class TestAccountCreate(TestCase):

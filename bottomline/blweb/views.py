@@ -101,8 +101,13 @@ def vehicle_config(request):
 
 
 def vehicle_config_model(request):
-    make = request.COOKIES['VehicleMake']
-    print("vehicle_config_model", make)
+    try:
+        # get the make from the cookie set earlier
+        make = request.COOKIES['VehicleMake']
+        print("vehicle_config_model", make)
+    except KeyError:
+        # handle the case where the cookie is not set. redirect back to the main config page
+        return HttpResponseRedirect('/vehicle_config')
 
     if request.method == "POST":
 
@@ -132,4 +137,3 @@ def vehicle_config_options(request):
         context = {'options_form': VehicleOptionsForm(prefix='options')}
 
     return render(request, 'vehicle_config_options.html', context)
-
