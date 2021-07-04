@@ -79,3 +79,11 @@ class VehicleConfig(models.Model):
                               help_text="The vehicle model associated with this option package")
     options = models.ManyToManyField(VehicleOption,
                                      help_text="List of options selected in this config")
+
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             default=None,
+                             help_text="The user associated with this vehicle configuration")
+
+    def __str__(self):
+        return self.config_name
