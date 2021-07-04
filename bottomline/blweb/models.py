@@ -61,3 +61,21 @@ class VehicleOption(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# VehicleConfig class. Models the build a user would put together on the site.
+# captures the make, model, color and options.
+class VehicleConfig(models.Model):
+    config_name = models.CharField(max_length=200,
+                                   help_text="The name of this vehicle configuration",
+                                   default=None)
+    make = models.ForeignKey(VehicleMake,
+                             on_delete=models.CASCADE,
+                             default=None,
+                             help_text="The vehicle make associated with this build")
+    model = models.ForeignKey(VehicleModel,
+                              on_delete=models.CASCADE,
+                              default=None,
+                              help_text="The vehicle model associated with this option package")
+    options = models.ManyToManyField(VehicleOption,
+                                     help_text="List of options selected in this config")
