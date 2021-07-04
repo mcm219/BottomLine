@@ -104,7 +104,6 @@ def vehicle_config_model(request):
     try:
         # get the make from the cookie set earlier
         make = request.COOKIES['VehicleMake']
-        print("vehicle_config_model", make)
     except KeyError:
         # handle the case where the cookie is not set. redirect back to the main config page
         return HttpResponseRedirect('/vehicle_config')
@@ -112,9 +111,6 @@ def vehicle_config_model(request):
     if request.method == "POST":
 
         model_form = VehicleModelForm(request.POST, prefix='mod', chosen_make=make)
-
-        print("errors: ", model_form.errors)
-        print("non-field errors:", model_form.non_field_errors())
 
         if model_form.is_valid():
             # get the model
