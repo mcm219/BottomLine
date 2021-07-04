@@ -65,20 +65,18 @@ class VehicleModelForm(forms.ModelForm):
         return super(VehicleModelForm, self).save(**kwargs)
 
     def clean_name(self):
-        print("CLEAN NAME")
         return self.cleaned_data['name']
 
     def clean(self):
         cleaned_data = super(VehicleModelForm, self).clean()
 
-        model_name = cleaned_data.get('name')
-        print('VehicleModelForm::clean: name: ', model_name)
         # check to see if this instance has an associated make
         if self.chosen_make is None:
             raise ValidationError(
                 "No VehicleMake associated with this instance."
             )
         return cleaned_data
+
 
 class VehicleOptionsForm(forms.ModelForm):
     class Meta:
