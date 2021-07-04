@@ -91,6 +91,41 @@ class TestVehicleConfig(TestCase):
         self.assertIn('name', form.errors.keys())
         self.assertIn('Select a valid choice. That choice is not one of the available choices.', form.errors['name'])
 
+    # test good data in the VehicleModelForm
+    def test_vehicle_model_form(self):
+        make = VehicleMake.objects.create(
+            name='Ferrari',
+            website='www.ferrari.com',
+        )
+        # now a test model
+        model = VehicleModel.objects.create(
+            name='Roma',
+            year=2021,
+            make=make
+        )
+
+        form = VehicleModelForm({'name': model.pk}, chosen_make=make.name)
+        self.assertTrue(form.is_valid())
+
+    # test bad data in the VehicleModelForm
+    def test_vehicle_model_form_bad(self):
+        make = VehicleMake.objects.create(
+            name='Ferrari',
+            website='www.ferrari.com',
+        )
+        # now a test model
+        model = VehicleModel.objects.create(
+            name='Roma',
+            year=2021,
+            make=make
+        )
+
+        form = VehicleModelForm({'name': 'problems'}, chosen_make=make)
+        self.assertFalse(form.is_valid())
+        self.assertIn('name', form.errors.keys())
+        self.assertIn('Select a valid choice. That choice is not one of the available choices.',
+                      form.errors['name'])
+
     # test  VehicleMakeForm name field
     def test_vehicle_make_form_fields(self):
         form = VehicleMakeForm()
