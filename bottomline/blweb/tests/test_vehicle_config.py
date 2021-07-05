@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.test import Client
 
 from blweb.forms import VehicleMakeForm, VehicleModelForm
-from blweb.models import VehicleMake
+from blweb.models import VehicleMake, VehicleConfig
 from blweb.models import VehicleModel
 from blweb.models import VehicleOption
 
@@ -63,8 +63,18 @@ class TestVehicleConfig(TestCase):
             year=2021,
             make=make
         )
+        # create a test VehicleConfig from the make above
+        veh_config = VehicleConfig.objects.create(make=make)
+        veh_config.save()
 
+        # for now we still need to set this cookie
         self.client.cookies = SimpleCookie({'VehicleMake': 'Ferrari'})
+
+        # set the required session variable
+        session = self.client.session
+        session['vehicle_config'] = veh_config.pk
+        session.save()
+
         response = self.client.post('/vehicle_config_model/', {'mod-name': model.pk}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, template_name='vehicle_config_options.html')
