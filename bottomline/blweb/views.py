@@ -6,7 +6,7 @@ from django.shortcuts import render
 # Create your views here.
 from blweb import utils
 from blweb.forms import SignupForm, VehicleConfigForm, VehicleMakeForm, VehicleModelForm, VehicleOptionsForm
-from blweb.models import AccountType
+from blweb.models import AccountType, VehicleConfig
 
 
 # This is the view for the BottomLine main landing page. It renders the landing.html template
@@ -82,7 +82,13 @@ def vehicle_config(request):
         if make_form.is_valid():
             # Get the make
             make = make_form.cleaned_data.get('name')
-            print("Vehicle Make: ", make)
+            print("Vehicle Make: ", make.name)
+
+            # We've started a new VehicleConfig
+            veh_config = VehicleConfig.objects.create(make=make)
+
+            # now save it in the session so it can be retrieved in other views later
+            request.session['vehicle_config'] = veh_config.pk
 
             # both make and model have been specified, this is a success
             # redirect to the next page for vehicle options
@@ -105,18 +111,35 @@ def vehicle_config_model(request):
         # get the make from the cookie set earlier
         make = request.COOKIES['VehicleMake']
     except KeyError:
-        # handle the case where the cookie is not set. redirect back to the main config page
+        # handle the case where the session key is not set. redirect back to the main config page
         return HttpResponseRedirect('/vehicle_config')
 
     if request.method == "POST":
-
         model_form = VehicleModelForm(request.POST, prefix='mod', chosen_make=make)
 
         if model_form.is_valid():
-            # get the model
-            model = model_form.cleaned_data.get('name')
-            print("Vehicle Model: ", model)
+            try:
+                # retrieve our VehicleConfig primary key from the session
+                veh_config_id = request.session.get('vehicle_config', None)
+            except KeyError:
+                # handle the case where the session key is not set. redirect back to the main config page
+                return HttpResponseRedirect('/vehicle_config')
 
+            if veh_config_id is not None:
+                # get the actual object from the key
+                veh_config = VehicleConfig.objects.get(pk=veh_config_id)
+
+                # get the model
+                model = model_form.cleaned_data.get('name')
+                print("Vehicle Model: ", model)
+
+                # add the model to the VehicleConfig
+                veh_config.model = model
+                veh_config.save()
+            else:
+                return HttpResponseRedirect('/vehicle_config')
+
+            # send the user to the options page to add vehicle options
             return HttpResponseRedirect('/vehicle_config_options')
         else:
             context = {'model_form': model_form}
@@ -127,8 +150,16 @@ def vehicle_config_model(request):
 
 
 def vehicle_config_options(request):
+    # TEST, print out the make/model from the session to make sure it's made it so far
+    veh_config_id = request.session.get("vehicle_config", None)
+    if veh_config_id is not None:
+        veh_config = VehicleConfig.objects.get(pk=veh_config_id)
+        print("Options Page::Make: ", veh_config.make)
+        print("Options Page::Model: ", veh_config.model)
+
     if request.method == "POST":
         options_form = VehicleOptionsForm(request.POST, prefix='options')
+
     else:
         context = {'options_form': VehicleOptionsForm(prefix='options')}
 
