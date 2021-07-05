@@ -68,7 +68,9 @@ class VehicleOption(models.Model):
 class VehicleConfig(models.Model):
     config_name = models.CharField(max_length=200,
                                    help_text="The name of this vehicle configuration",
-                                   default=None)
+                                   default=None,
+                                   null=True,
+                                   blank=True)
     make = models.ForeignKey(VehicleMake,
                              on_delete=models.CASCADE,
                              default=None,
@@ -76,12 +78,17 @@ class VehicleConfig(models.Model):
     model = models.ForeignKey(VehicleModel,
                               on_delete=models.CASCADE,
                               default=None,
+                              null=True,
+                              blank=True,
                               help_text="The vehicle model associated with this option package")
     options = models.ManyToManyField(VehicleOption,
+                                     blank=True,
                                      help_text="List of options selected in this config")
 
     user = models.ForeignKey(User,
                              on_delete=models.CASCADE,
+                             null=True,
+                             blank=True,
                              default=None,
                              help_text="The user associated with this vehicle configuration")
 
