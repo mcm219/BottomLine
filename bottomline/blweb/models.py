@@ -63,6 +63,12 @@ class VehicleOption(models.Model):
         return self.name
 
 
+# extend the VehicleOption class to specifically call out colors, which are like options
+# but may have some unique attributes eventually (e.g. flat, metallic, matte)
+class VehicleColor(VehicleOption):
+    pass
+
+
 # VehicleConfig class. Models the build a user would put together on the site.
 # captures the make, model, color and options.
 class VehicleConfig(models.Model):
