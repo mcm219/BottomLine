@@ -93,4 +93,7 @@ class VehicleConfig(models.Model):
                              help_text="The user associated with this vehicle configuration")
 
     def __str__(self):
-        return self.config_name
+        if self.config_name is None:
+            return "New " + str(self.make)
+        else:
+            return self.config_name
