@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 
-from blweb.models import VehicleModel, VehicleOption, VehicleMake, Profile
+from blweb.models import VehicleModel, VehicleOption, VehicleMake, Profile, VehicleConfig
 
 
 class ProfileInline(admin.StackedInline):
@@ -21,4 +21,5 @@ admin.site.register(User, UserAdmin)
 admin.site.register(VehicleModel)
 admin.site.register(VehicleMake)
 admin.site.register(VehicleOption)
+admin.site.register(VehicleConfig)
 
