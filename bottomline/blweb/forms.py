@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from blweb.models import VehicleMake, VehicleModel, VehicleOption
+from blweb.models import VehicleMake, VehicleModel, VehicleOption, VehicleColor
 
 
 # The superclass for the specific user signup forms (shopper and dealer)
@@ -82,4 +82,21 @@ class VehicleOptionsForm(forms.ModelForm):
     class Meta:
         model = VehicleOption
         fields = ['name']
+
+    def __init__(self, *args, **kwargs):
+
+        self.chosen_model = kwargs.pop('chosen_make', None)
+        super(VehicleOptionsForm, self).__init__(*args, **kwargs)
+        if self.chosen_model is not None:
+            self.fields['options'].queryset = VehicleOption.objects.filter(model=self.chosen_model).order_by('name')
+            self.fields['colors'].queryset = VehicleColor.objects.filter(model=self.chosen_model).order_by('name')
+        else:
+            self.fields['options'].queryset = VehicleOption.objects.distinct().order_by('name')
+            self.fields['colors'].queryset = VehicleColor.objects.filter(model=self.chosen_model).order_by('name')
+
+    colors = forms.ModelMultipleChoiceField(queryset=VehicleColor.objects.distinct().order_by('name'),
+                                            widget=forms.CheckboxSelectMultiple,)
+
+    options = forms.ModelMultipleChoiceField(queryset=VehicleOption.objects.distinct().order_by('name'),
+                                             widget=forms.CheckboxSelectMultiple,)
 
