@@ -1,10 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+{% extends "landing.html" %}
+{% block title %}BottomLine{% endblock %}
+{% block content %}
+<h2>Vehicle Config (Options)</h2>
+<div>
+<p>
+Now select the desired options.
+</p>
+</div>
+<form method="post">
+    {% csrf_token %}
+    {{ options_form.as_p }}
+    <p>
+        <button type="submit" name="button_element" value="Button Element">
+    Next: Summary
+        </button>
+    </p>
+</form>
+{% endblock %}
