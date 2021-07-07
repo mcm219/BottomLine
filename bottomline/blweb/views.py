@@ -158,7 +158,7 @@ def vehicle_config_options(request):
         print("Options Page::Model: ", veh_config.model)
 
     if request.method == "POST":
-        options_form = VehicleOptionsForm(request.POST, prefix='options')
+        options_form = VehicleOptionsForm(request.POST, prefix='options', chosen_model=veh_config.model.pk)
 
     else:
         context = {'options_form': VehicleOptionsForm(prefix='options')}
