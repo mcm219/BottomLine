@@ -5,7 +5,8 @@ from django.shortcuts import render
 
 # Create your views here.
 from blweb import utils
-from blweb.forms import SignupForm, VehicleConfigForm, VehicleMakeForm, VehicleModelForm, VehicleOptionsForm
+from blweb.forms import SignupForm, VehicleConfigForm, VehicleMakeForm, VehicleModelForm, VehicleOptionsForm, \
+    VehicleColorOptionsForm
 from blweb.models import AccountType, VehicleConfig
 
 
@@ -159,8 +160,10 @@ def vehicle_config_options(request):
 
     if request.method == "POST":
         options_form = VehicleOptionsForm(request.POST, prefix='options', chosen_model=veh_config.model.pk)
-
+        colors_form = VehicleColorOptionsForm(request.POST, prefix='options', chosen_model=veh_config.model.pk)
+        context = {'options_form': options_form, 'colors_form': colors_form}
     else:
-        context = {'options_form': VehicleOptionsForm(prefix='options')}
+        context = {'options_form': VehicleOptionsForm(prefix='options', chosen_model=veh_config.model.pk),
+                   'colors_form': VehicleColorOptionsForm(prefix='colors', chosen_model=veh_config.model.pk), }
 
     return render(request, 'vehicle_config_options.html', context)
