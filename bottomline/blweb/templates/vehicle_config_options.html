@@ -9,6 +9,7 @@ Now select the desired options.
 </div>
 <form method="post">
     {% csrf_token %}
+    {{ colors_form.as_p }}
     {{ options_form.as_p }}
     <p>
         <button type="submit" name="button_element" value="Button Element">
