@@ -81,22 +81,37 @@ class VehicleModelForm(forms.ModelForm):
 class VehicleOptionsForm(forms.ModelForm):
     class Meta:
         model = VehicleOption
-        fields = ['name']
+        #fields = ['name']
+        fields = []
 
     def __init__(self, *args, **kwargs):
 
-        self.chosen_model = kwargs.pop('chosen_make', None)
+        self.chosen_model = kwargs.pop('chosen_model', None)
         super(VehicleOptionsForm, self).__init__(*args, **kwargs)
         if self.chosen_model is not None:
             self.fields['options'].queryset = VehicleOption.objects.filter(model=self.chosen_model).order_by('name')
-            self.fields['colors'].queryset = VehicleColor.objects.filter(model=self.chosen_model).order_by('name')
         else:
             self.fields['options'].queryset = VehicleOption.objects.distinct().order_by('name')
-            self.fields['colors'].queryset = VehicleColor.objects.filter(model=self.chosen_model).order_by('name')
-
-    colors = forms.ModelMultipleChoiceField(queryset=VehicleColor.objects.distinct().order_by('name'),
-                                            widget=forms.CheckboxSelectMultiple,)
 
     options = forms.ModelMultipleChoiceField(queryset=VehicleOption.objects.distinct().order_by('name'),
                                              widget=forms.CheckboxSelectMultiple,)
 
+
+# provide the form choices for vehicle colors as well
+class VehicleColorOptionsForm(forms.ModelForm):
+    class Meta:
+        model = VehicleColor
+        #fields = ['name']
+        fields = []
+
+    def __init__(self, *args, **kwargs):
+
+        self.chosen_model = kwargs.pop('chosen_model', None)
+        super(VehicleColorOptionsForm, self).__init__(*args, **kwargs)
+        if self.chosen_model is not None:
+            self.fields['colors'].queryset = VehicleColor.objects.filter(model=self.chosen_model).order_by('name')
+        else:
+            self.fields['colors'].queryset = VehicleColor.objects.filter(model=self.chosen_model).order_by('name')
+
+    colors = forms.ModelMultipleChoiceField(queryset=VehicleColor.objects.distinct().order_by('name'),
+                                            widget=forms.CheckboxSelectMultiple,)
