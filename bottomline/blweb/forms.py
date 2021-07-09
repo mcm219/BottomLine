@@ -89,9 +89,11 @@ class VehicleOptionsForm(forms.ModelForm):
         self.chosen_model = kwargs.pop('chosen_model', None)
         super(VehicleOptionsForm, self).__init__(*args, **kwargs)
         if self.chosen_model is not None:
-            self.fields['options'].queryset = VehicleOption.objects.filter(model=self.chosen_model).order_by('name')
+            self.fields['options'].queryset = VehicleOption.objects.filter(model=self.chosen_model).\
+                exclude(vehiclecolor__isnull=False).order_by('name')
         else:
-            self.fields['options'].queryset = VehicleOption.objects.distinct().order_by('name')
+            self.fields['options'].queryset = VehicleOption.objects.distinct().\
+                exclude(vehiclecolor__isnull=False).order_by('name')
 
     options = forms.ModelMultipleChoiceField(queryset=VehicleOption.objects.distinct().order_by('name'),
                                              widget=forms.CheckboxSelectMultiple,)
