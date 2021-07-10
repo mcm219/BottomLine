@@ -116,7 +116,8 @@ class VehicleColorOptionsForm(forms.ModelForm):
             self.fields['colors'].queryset = VehicleColor.objects.filter(model=self.chosen_model).order_by('name')
 
         # now set the default color
-        self.fields['colors'].initial = VehicleColor.objects.filter(model=self.chosen_model).order_by('name')[0].pk
+        if VehicleColor.objects.filter(model=self.chosen_model).count() > 0:
+            self.fields['colors'].initial = VehicleColor.objects.filter(model=self.chosen_model).order_by('name')[0].pk
 
     colors = forms.ModelChoiceField(queryset=VehicleColor.objects.distinct().order_by('name'),
                                     widget=forms.RadioSelect,
