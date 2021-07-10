@@ -96,14 +96,14 @@ class VehicleOptionsForm(forms.ModelForm):
                 exclude(vehiclecolor__isnull=False).order_by('name')
 
     options = forms.ModelMultipleChoiceField(queryset=VehicleOption.objects.distinct().order_by('name'),
-                                             widget=forms.CheckboxSelectMultiple,)
+                                             widget=forms.CheckboxSelectMultiple,
+                                             required=False)
 
 
 # provide the form choices for vehicle colors as well
 class VehicleColorOptionsForm(forms.ModelForm):
     class Meta:
         model = VehicleColor
-        #fields = ['name']
         fields = []
 
     def __init__(self, *args, **kwargs):
@@ -115,5 +115,9 @@ class VehicleColorOptionsForm(forms.ModelForm):
         else:
             self.fields['colors'].queryset = VehicleColor.objects.filter(model=self.chosen_model).order_by('name')
 
-    colors = forms.ModelMultipleChoiceField(queryset=VehicleColor.objects.distinct().order_by('name'),
-                                            widget=forms.CheckboxSelectMultiple,)
+        # now set the default color
+        self.fields['colors'].initial = VehicleColor.objects.filter(model=self.chosen_model).order_by('name')[0].pk
+
+    colors = forms.ModelChoiceField(queryset=VehicleColor.objects.distinct().order_by('name'),
+                                    widget=forms.RadioSelect,
+                                    required=False)
