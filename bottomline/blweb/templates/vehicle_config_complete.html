@@ -1,0 +1,22 @@
+{% extends "landing.html" %}
+{% block title %}BottomLine{% endblock %}
+{% block content %}
+<h2>Vehicle Config Complete</h2>
+<div>
+<p>
+Below is your final configuration:
+</p>
+</div>
+<div>
+<p>
+Make: {{ make }} <br>
+Model: {{ model }} <br>
+Color: {{ color }} <br>
+Options: <br>
+{%  for option in options.all %}
+  {{ option }} <br>
+{% endfor %}
+</p>
+</div>
+{% endblock %}
+
