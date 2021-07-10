@@ -91,6 +91,14 @@ class VehicleConfig(models.Model):
                                      blank=True,
                                      help_text="List of options selected in this config")
 
+    color = models.ForeignKey(VehicleColor,
+                              on_delete=models.CASCADE,
+                              default=None,
+                              null=True,
+                              blank=True,
+                              related_name='color',
+                              help_text="The chosen color for this config")
+
     user = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              null=True,
