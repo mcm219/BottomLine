@@ -151,8 +151,12 @@ def vehicle_config_model(request):
 
 
 def vehicle_config_options(request):
-    # TEST, print out the make/model from the session to make sure it's made it so far
-    veh_config_id = request.session.get("vehicle_config", None)
+    try:
+        veh_config_id = request.session.get("vehicle_config", None)
+    except KeyError:
+        # handle the case where the session key is not set. redirect back to the main config page
+        return HttpResponseRedirect('/vehicle_config')
+
     if veh_config_id is not None:
         veh_config = VehicleConfig.objects.get(pk=veh_config_id)
         print("Options Page::Make: ", veh_config.make)
@@ -160,10 +164,55 @@ def vehicle_config_options(request):
 
     if request.method == "POST":
         options_form = VehicleOptionsForm(request.POST, prefix='options', chosen_model=veh_config.model.pk)
-        colors_form = VehicleColorOptionsForm(request.POST, prefix='options', chosen_model=veh_config.model.pk)
+        colors_form = VehicleColorOptionsForm(request.POST, prefix='colors', chosen_model=veh_config.model.pk)
         context = {'options_form': options_form, 'colors_form': colors_form}
+
+        if options_form.is_valid() and colors_form.is_valid():
+            if veh_config_id is not None:
+                # get the actual object from the key
+                veh_config = VehicleConfig.objects.get(pk=veh_config_id)
+
+                # get the options from the form
+                options = options_form.cleaned_data.get('options')
+
+                # get the color from the form
+                color = colors_form.cleaned_data.get('colors')
+
+                # add to the current vehicle config object
+                veh_config.options.add(*options)
+                veh_config.color = color
+                veh_config.save()
+            else:
+                return HttpResponseRedirect('/vehicle_config')
+
+            # send the user to the completion page to add vehicle options
+            return HttpResponseRedirect('/vehicle_config_complete')
+        else:
+            context = {'options_form': options_form,
+                       'colors_form': colors_form}
     else:
         context = {'options_form': VehicleOptionsForm(prefix='options', chosen_model=veh_config.model.pk),
                    'colors_form': VehicleColorOptionsForm(prefix='colors', chosen_model=veh_config.model.pk), }
 
     return render(request, 'vehicle_config_options.html', context)
+
+
+def vehicle_config_complete(request):
+    try:
+        veh_config_id = request.session.get("vehicle_config", None)
+    except KeyError:
+        # handle the case where the session key is not set. redirect back to the main config page
+        return HttpResponseRedirect('/vehicle_config')
+
+    if veh_config_id is not None:
+        # get the actual object from the key
+        veh_config = VehicleConfig.objects.get(pk=veh_config_id)
+
+        context = {'make': veh_config.make.name,
+                   'model': veh_config.model.name,
+                   'color': veh_config.color.name,
+                   'options': veh_config.options}
+    else:
+        context = {}
+    return render(request, 'vehicle_config_complete.html', context)
+
