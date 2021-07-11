@@ -99,6 +99,17 @@ class VehicleOptionsForm(forms.ModelForm):
                                              widget=forms.CheckboxSelectMultiple,
                                              required=False)
 
+    def clean(self):
+        cleaned_data = super(VehicleOptionsForm, self).clean()
+
+        # check to make sure all the options selected actually belong to the appropriate vehicle model
+        for option in cleaned_data.get('options').all():
+            if option.model.pk != self.chosen_model:
+                raise ValidationError(
+                    "Option does not exist for the chosen vehicle make/model."
+                )
+        return cleaned_data
+
 
 # provide the form choices for vehicle colors as well
 class VehicleColorOptionsForm(forms.ModelForm):
