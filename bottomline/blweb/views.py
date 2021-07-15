@@ -7,7 +7,7 @@ from django.shortcuts import render
 from blweb import utils
 from blweb.forms import SignupForm, VehicleConfigForm, VehicleMakeForm, VehicleModelForm, VehicleOptionsForm, \
     VehicleColorOptionsForm
-from blweb.models import AccountType, VehicleConfig
+from blweb.models import AccountType, VehicleConfig, VehicleOption
 
 
 # This is the view for the BottomLine main landing page. It renders the landing.html template
@@ -150,6 +150,18 @@ def vehicle_config_model(request):
     return render(request, 'vehicle_config_model.html', context)
 
 
+# take the dict context and the VehicleConfig veh_config and add the options with pricing
+# to the context.
+def add_option_price_context(context, veh_config):
+    if veh_config is None:
+        return context
+
+    for option in VehicleOption.objects.filter(model=veh_config.model.pk):
+        context[f'veh_option_{option.pk}'] = option.price
+
+    return context
+
+
 def vehicle_config_options(request):
     try:
         veh_config_id = request.session.get("vehicle_config", None)
@@ -189,10 +201,20 @@ def vehicle_config_options(request):
             return HttpResponseRedirect('/vehicle_config_complete')
         else:
             context = {'options_form': options_form,
-                       'colors_form': colors_form}
+                       'colors_form': colors_form,
+                       'veh_make': veh_config.make.name,
+                       'veh_model': veh_config.model.name,
+                       'veh_model_price': veh_config.model.price}
+            context = add_option_price_context(context=context,
+                                               veh_config=veh_config)
     else:
         context = {'options_form': VehicleOptionsForm(prefix='options', chosen_model=veh_config.model.pk),
-                   'colors_form': VehicleColorOptionsForm(prefix='colors', chosen_model=veh_config.model.pk), }
+                   'colors_form': VehicleColorOptionsForm(prefix='colors', chosen_model=veh_config.model.pk),
+                   'veh_make': veh_config.make.name,
+                   'veh_model': veh_config.model.name,
+                   'veh_model_price': veh_config.model.price}
+        context = add_option_price_context(context=context,
+                                           veh_config=veh_config)
 
     return render(request, 'vehicle_config_options.html', context)
 
@@ -215,4 +237,3 @@ def vehicle_config_complete(request):
     else:
         context = {}
     return render(request, 'vehicle_config_complete.html', context)
-
