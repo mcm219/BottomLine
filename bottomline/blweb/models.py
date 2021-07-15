@@ -44,6 +44,8 @@ class VehicleModel(models.Model):
                              on_delete=models.CASCADE,
                              default=None,
                              help_text="The vehicle make that this model is associated with")
+    price = models.IntegerField(default=0,
+                                help_text="The base MSRP for the model, not including options")
 
     def __str__(self):
         return self.name
