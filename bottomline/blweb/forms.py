@@ -7,6 +7,20 @@ from django.core.exceptions import ValidationError
 from blweb.models import VehicleMake, VehicleModel, VehicleOption, VehicleColor
 
 
+class VehicleModelOptionChoiceField(forms.ModelMultipleChoiceField):
+    # override the label_from_instance method to display
+    # price information
+    def label_from_instance(self, obj):
+        return f'{obj.name}  (${obj.price})'
+
+
+class VehicleModelColorOptionChoiceField(forms.ModelChoiceField):
+    # override the label_from_instance method to display
+    # price information
+    def label_from_instance(self, obj):
+        return f'{obj.name}  (${obj.price})'
+
+
 # The superclass for the specific user signup forms (shopper and dealer)
 class SignupForm(UserCreationForm):
     first_name = forms.CharField(max_length=30)
@@ -24,9 +38,9 @@ class VehicleConfigForm(forms.Form):
     def __init__(self, chosen_make=None, *args, **kwargs):
         super(VehicleConfigForm, self).__init__(*args, **kwargs)
         self.chosen_make = chosen_make
-        #if self.chosen_make is not None:
+        # if self.chosen_make is not None:
         #    model = forms.ModelChoiceField(queryset=VehicleModel.objects.filter(make=self.chosen_make))
-        #else:
+        # else:
         #    model = forms.ModelChoiceField(queryset=None, widget=forms.HiddenInput())
 
     # get a list of all makes in the make model currently
@@ -35,7 +49,6 @@ class VehicleConfigForm(forms.Form):
 
 
 class VehicleMakeForm(forms.ModelForm):
-
     name = forms.ModelChoiceField(queryset=VehicleMake.objects.all().order_by('name'), label='Vehicle Make')
 
     class Meta:
@@ -44,7 +57,6 @@ class VehicleMakeForm(forms.ModelForm):
 
 
 class VehicleModelForm(forms.ModelForm):
-
     class Meta:
         model = VehicleModel
         fields = ['name']
@@ -81,7 +93,7 @@ class VehicleModelForm(forms.ModelForm):
 class VehicleOptionsForm(forms.ModelForm):
     class Meta:
         model = VehicleOption
-        #fields = ['name']
+        # fields = ['name']
         fields = []
 
     def __init__(self, *args, **kwargs):
@@ -89,15 +101,16 @@ class VehicleOptionsForm(forms.ModelForm):
         self.chosen_model = kwargs.pop('chosen_model', None)
         super(VehicleOptionsForm, self).__init__(*args, **kwargs)
         if self.chosen_model is not None:
-            self.fields['options'].queryset = VehicleOption.objects.filter(model=self.chosen_model).\
+            self.fields['options'].queryset = VehicleOption.objects.filter(model=self.chosen_model). \
                 exclude(vehiclecolor__isnull=False).order_by('name')
         else:
-            self.fields['options'].queryset = VehicleOption.objects.distinct().\
+            self.fields['options'].queryset = VehicleOption.objects.distinct(). \
                 exclude(vehiclecolor__isnull=False).order_by('name')
 
-    options = forms.ModelMultipleChoiceField(queryset=VehicleOption.objects.distinct().order_by('name'),
-                                             widget=forms.CheckboxSelectMultiple,
-                                             required=False)
+    options = VehicleModelOptionChoiceField(queryset=VehicleOption.objects.distinct().order_by('name'),
+                                            widget=forms.CheckboxSelectMultiple,
+                                            # empty_label=None,
+                                            required=False)
 
     def clean(self):
         cleaned_data = super(VehicleOptionsForm, self).clean()
@@ -130,6 +143,6 @@ class VehicleColorOptionsForm(forms.ModelForm):
         if VehicleColor.objects.filter(model=self.chosen_model).count() > 0:
             self.fields['colors'].initial = VehicleColor.objects.filter(model=self.chosen_model).order_by('name')[0].pk
 
-    colors = forms.ModelChoiceField(queryset=VehicleColor.objects.distinct().order_by('name'),
-                                    widget=forms.RadioSelect,
-                                    required=False)
+    colors = VehicleModelColorOptionChoiceField(queryset=VehicleColor.objects.distinct().order_by('name'),
+                                                widget=forms.RadioSelect,
+                                                required=False)
