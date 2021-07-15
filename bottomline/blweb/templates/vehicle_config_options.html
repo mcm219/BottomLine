@@ -4,13 +4,17 @@
 <h2>Vehicle Config (Options)</h2>
 <div>
 <p>
-Now select the desired options.
+Now select the desired options for your new {{ veh_make }} {{ veh_model }}.
 </p>
 </div>
 <form method="post">
     {% csrf_token %}
     {{ colors_form.as_p }}
     {{ options_form.as_p }}
+
+    <h3>Base Price: ${{ veh_model_price }}</h3>
+    <h3>Added Options: $</h3>
+    <h3><b>TOTAL: $</b></h3>
     <p>
         <button type="submit" name="button_element" value="Button Element">
     Next: Summary
