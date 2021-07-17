@@ -7,18 +7,49 @@
 Now select the desired options for your new {{ veh_make }} {{ veh_model }}.
 </p>
 </div>
+<script type="text/javascript">
+    function updateTotal(){
+        var options_subtotal = 0;
+        var subtotal = {{ veh_model_price }};
+        var option_pricing = {{ veh_options }};
+        var color_pricing = {{ veh_color_options }};
+
+        // determine which options are selected
+        for(let i=0; i < Object.keys(option_pricing).length; i++){
+            if(document.getElementById('id_options-options_' + i).checked) {
+                options_subtotal += option_pricing[document.getElementById('id_options-options_' + i).value];
+            }
+        }
+
+        // determine which color options are selected
+        for(let i=0; i < Object.keys(color_pricing).length; i++){
+            if(document.getElementById('id_colors-colors_' + i).checked) {
+                options_subtotal += color_pricing[document.getElementById('id_colors-colors_' + i).value];
+            }
+        }
+
+        subtotal += options_subtotal;
+
+        // now update the total
+        document.getElementById('options_total').innerText = 'Added Options: $' + options_subtotal;
+        document.getElementById('grand_total').innerText = 'TOTAL: $' + subtotal;
+    }
+
+
+</script>
 <form method="post">
     {% csrf_token %}
     {{ colors_form.as_p }}
     {{ options_form.as_p }}
 
     <h3>Base Price: ${{ veh_model_price }}</h3>
-    <h3>Added Options: $</h3>
-    <h3><b>TOTAL: $</b></h3>
+    <h3 id="options_total">Added Options: $</h3>
+    <h3 id="grand_total"><b>TOTAL: $</b></h3>
     <p>
         <button type="submit" name="button_element" value="Button Element">
     Next: Summary
         </button>
     </p>
+
 </form>
 {% endblock %}
