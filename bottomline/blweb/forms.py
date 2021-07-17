@@ -108,8 +108,7 @@ class VehicleOptionsForm(forms.ModelForm):
                 exclude(vehiclecolor__isnull=False).order_by('name')
 
     options = VehicleModelOptionChoiceField(queryset=VehicleOption.objects.distinct().order_by('name'),
-                                            widget=forms.CheckboxSelectMultiple,
-                                            # empty_label=None,
+                                            widget=forms.CheckboxSelectMultiple(attrs={'onClick': 'updateTotal();'}),
                                             required=False)
 
     def clean(self):
@@ -144,5 +143,5 @@ class VehicleColorOptionsForm(forms.ModelForm):
             self.fields['colors'].initial = VehicleColor.objects.filter(model=self.chosen_model).order_by('name')[0].pk
 
     colors = VehicleModelColorOptionChoiceField(queryset=VehicleColor.objects.distinct().order_by('name'),
-                                                widget=forms.RadioSelect,
+                                                widget=forms.RadioSelect(attrs={'onClick': 'updateTotal();'}),
                                                 required=False)
