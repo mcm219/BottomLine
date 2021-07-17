@@ -7,7 +7,7 @@ from django.shortcuts import render
 from blweb import utils
 from blweb.forms import SignupForm, VehicleConfigForm, VehicleMakeForm, VehicleModelForm, VehicleOptionsForm, \
     VehicleColorOptionsForm
-from blweb.models import AccountType, VehicleConfig, VehicleOption
+from blweb.models import AccountType, VehicleConfig, VehicleOption, VehicleColor
 
 
 # This is the view for the BottomLine main landing page. It renders the landing.html template
@@ -151,13 +151,29 @@ def vehicle_config_model(request):
 
 
 # take the dict context and the VehicleConfig veh_config and add the options with pricing
-# to the context.
-def add_option_price_context(context, veh_config):
+# to the context (as a dictionary)
+def add_option_price_context_dict(context, veh_config):
     if veh_config is None:
         return context
 
-    for option in VehicleOption.objects.filter(model=veh_config.model.pk):
-        context[f'veh_option_{option.pk}'] = option.price
+    context['veh_options'] = {}
+
+    for option in VehicleOption.objects.filter(model=veh_config.model.pk).exclude(vehiclecolor__isnull=False):
+        context['veh_options'][option.pk] = option.price
+
+    return context
+
+
+# take the dict context and the VehicleConfig veh_config and add the options with pricing
+# to the context (as a dictionary)
+def add_color_option_price_context_dict(context, veh_config):
+    if veh_config is None:
+        return context
+
+    context['veh_color_options'] = {}
+
+    for color in VehicleColor.objects.filter(model=veh_config.model.pk):
+        context['veh_color_options'][color.pk] = color.price
 
     return context
 
@@ -205,16 +221,22 @@ def vehicle_config_options(request):
                        'veh_make': veh_config.make.name,
                        'veh_model': veh_config.model.name,
                        'veh_model_price': veh_config.model.price}
-            context = add_option_price_context(context=context,
-                                               veh_config=veh_config)
+
+            context = add_option_price_context_dict(context=context,
+                                                    veh_config=veh_config)
+            context = add_color_option_price_context_dict(context=context,
+                                                          veh_config=veh_config)
     else:
         context = {'options_form': VehicleOptionsForm(prefix='options', chosen_model=veh_config.model.pk),
                    'colors_form': VehicleColorOptionsForm(prefix='colors', chosen_model=veh_config.model.pk),
                    'veh_make': veh_config.make.name,
                    'veh_model': veh_config.model.name,
                    'veh_model_price': veh_config.model.price}
-        context = add_option_price_context(context=context,
-                                           veh_config=veh_config)
+
+        context = add_option_price_context_dict(context=context,
+                                                veh_config=veh_config)
+        context = add_color_option_price_context_dict(context=context,
+                                                      veh_config=veh_config)
 
     return render(request, 'vehicle_config_options.html', context)
 
