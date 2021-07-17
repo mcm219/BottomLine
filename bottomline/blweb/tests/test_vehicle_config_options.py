@@ -1,4 +1,5 @@
 from django.http import SimpleCookie
+from django.template.loader import render_to_string
 from django.test import TestCase
 from django.test import Client
 
@@ -7,8 +8,10 @@ from blweb.models import VehicleMake, VehicleConfig, VehicleColor
 from blweb.models import VehicleModel
 from blweb.models import VehicleOption
 
-
 # Test class for unit tests on the vehicle config options
+from blweb.views import add_option_price_context_dict, add_color_option_price_context_dict
+
+
 class TestVehicleConfigOptions(TestCase):
     # set up the environment
     def setUp(self):
@@ -111,5 +114,93 @@ class TestVehicleConfigOptions(TestCase):
     def test_vehicle_color_options_form_fields(self):
         form = VehicleColorOptionsForm()
         self.assertIn("colors", form.fields)
+
+    # test that the price is visible in the rendered form for a color
+    def test_vehicle_color_price_rendered(self):
+        # create a test VehicleConfig from the make above
+        veh_config = VehicleConfig.objects.create(make=self.make,
+                                                  model=self.model,
+                                                  color=self.paint_color)
+        veh_config.save()
+
+        # set the required session variable
+        session = self.client.session
+        session['vehicle_config'] = veh_config.pk
+        session.save()
+
+        context = {'options_form': VehicleOptionsForm(prefix='options', chosen_model=veh_config.model.pk),
+                   'colors_form': VehicleColorOptionsForm(prefix='colors', chosen_model=veh_config.model.pk),
+                   'veh_make': veh_config.make.name,
+                   'veh_model': veh_config.model.name,
+                   'veh_model_price': veh_config.model.price}
+
+        context = add_option_price_context_dict(context=context,
+                                                veh_config=veh_config)
+        context = add_color_option_price_context_dict(context=context,
+                                                      veh_config=veh_config)
+        html = render_to_string('vehicle_config_options.html', context)
+        self.assertIn('Rosso Corsa', html)
+        self.assertIn('$1000', html)
+
+    # test that the price is visible in the rendered form for an option
+    def test_vehicle_option_price_rendered(self):
+        # create a test VehicleConfig from the make above
+        veh_config = VehicleConfig.objects.create(make=self.make,
+                                                  model=self.model,
+                                                  color=self.paint_color)
+        veh_config.save()
+
+        # set the required session variable
+        session = self.client.session
+        session['vehicle_config'] = veh_config.pk
+        session.save()
+
+        context = {'options_form': VehicleOptionsForm(prefix='options', chosen_model=veh_config.model.pk),
+                   'colors_form': VehicleColorOptionsForm(prefix='colors', chosen_model=veh_config.model.pk),
+                   'veh_make': veh_config.make.name,
+                   'veh_model': veh_config.model.name,
+                   'veh_model_price': veh_config.model.price}
+
+        context = add_option_price_context_dict(context=context,
+                                                veh_config=veh_config)
+        context = add_color_option_price_context_dict(context=context,
+                                                      veh_config=veh_config)
+        html = render_to_string('vehicle_config_options.html', context)
+        self.assertIn('Carbon Buckets', html)
+        self.assertIn('$5000', html)
+
+    # test that the price is visible in the rendered form for a color
+    def test_vehicle_color_price_rendered_second(self):
+        new_paint_color = VehicleColor.objects.create(name='Grigio Ferro',
+                                                      description='Dark grey',
+                                                      price=1234,
+                                                      model=self.model)
+
+        # create a test VehicleConfig from the make above
+        veh_config = VehicleConfig.objects.create(make=self.make,
+                                                  model=self.model,
+                                                  color=self.paint_color)
+        veh_config.save()
+
+        # set the required session variable
+        session = self.client.session
+        session['vehicle_config'] = veh_config.pk
+        session.save()
+
+        context = {'options_form': VehicleOptionsForm(prefix='options', chosen_model=veh_config.model.pk),
+                   'colors_form': VehicleColorOptionsForm(prefix='colors', chosen_model=veh_config.model.pk),
+                   'veh_make': veh_config.make.name,
+                   'veh_model': veh_config.model.name,
+                   'veh_model_price': veh_config.model.price}
+
+        context = add_option_price_context_dict(context=context,
+                                                veh_config=veh_config)
+        context = add_color_option_price_context_dict(context=context,
+                                                      veh_config=veh_config)
+        html = render_to_string('vehicle_config_options.html', context)
+        self.assertIn('Rosso Corsa', html)
+        self.assertIn('$1000', html)
+        self.assertIn('Grigio Ferro', html)
+        self.assertIn('$1234', html)
 
 
