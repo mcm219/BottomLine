@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from blweb.models import VehicleMake, VehicleModel, VehicleOption, VehicleColor
+from blweb.models import VehicleMake, VehicleModel, VehicleOption, VehicleColor, Profile, Address
 
 
 class VehicleModelOptionChoiceField(forms.ModelMultipleChoiceField):
@@ -145,3 +145,25 @@ class VehicleColorOptionsForm(forms.ModelForm):
     colors = VehicleModelColorOptionChoiceField(queryset=VehicleColor.objects.distinct().order_by('name'),
                                                 widget=forms.RadioSelect(attrs={'onClick': 'updateTotal();'}),
                                                 required=False)
+
+
+# Form to allow shoppers to edit their profile information
+class EditProfileAddress(forms.ModelForm):
+    class Meta:
+        model = Address
+        fields = ['street', 'city', 'zip_code', 'state']
+
+
+# Form to allow shoppers to edit their profile information
+class DealerEditProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['dealer_make']
+
+    def __init__(self, *args, **kwargs):
+        super(DealerEditProfileForm, self).__init__(*args, **kwargs)
+
+        # set the choices to the be set of vehicle makes known to the system
+        self.fields['dealer_make'].queryset = VehicleMake.objects.all().order_by('name')
+
+

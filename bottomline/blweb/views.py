@@ -6,7 +6,7 @@ from django.shortcuts import render
 # Create your views here.
 from blweb import utils
 from blweb.forms import SignupForm, VehicleConfigForm, VehicleMakeForm, VehicleModelForm, VehicleOptionsForm, \
-    VehicleColorOptionsForm
+    VehicleColorOptionsForm, DealerEditProfileForm, EditProfileAddress
 from blweb.models import AccountType, VehicleConfig, VehicleOption, VehicleColor
 
 
@@ -26,6 +26,43 @@ def index(request):
 @login_required
 def profile(request):
     return render(request, 'profile.html')
+
+
+@login_required
+def profile_edit(request):
+    if request.method == "POST":
+        address_form = EditProfileAddress(request.POST)
+        dealer_profile = DealerEditProfileForm(request.POST)
+
+        context = {'address_form': address_form, 'dealer_profile': dealer_profile}
+
+        if address_form.is_valid() and dealer_profile.is_valid():
+
+            # get the data and save the profile information
+            address = address_form.save()
+
+            # get the dealer make info
+            make = dealer_profile.cleaned_data.get('dealer_make')
+
+            user = request.user
+            user.refresh_from_db()
+            user.profile.address = address
+
+            if make is not None:
+                user.profile.dealer_make = make
+
+            user.save()
+
+            # send the user back to the profile page where they will be able to see their changes applied
+            return HttpResponseRedirect('/accounts/profile')
+        else:
+            context = {'address_form': address_form,
+                       'dealer_form': dealer_profile}
+    else:
+        context = {'address_form': EditProfileAddress(),
+                   'dealer_form': DealerEditProfileForm()}
+
+    return render(request, 'profile_edit.html', context)
 
 
 # use the account_signup.html template for account signups. This view is specifically for car shoppers to
