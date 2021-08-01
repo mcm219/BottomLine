@@ -1,9 +1,8 @@
 {% extends "landing.html" %}
 {% block title %}BottomLine{% endblock %}
 {% block content %}
-<h2>Profile</h2>
+<h2>Edit Profile</h2>
 <div>
-<p>
 Username: {{ request.user.username }} <br>
 Name: {{ request.user.first_name }} {{ request.user.last_name}}<br>
 Mailing Address:  <br>
@@ -21,9 +20,21 @@ Account Type: Car Shopper<br>
 Account Type: Car Dealer<br>
 Vehicle Make Sold: {{ user.profile.dealer_make }}
 {% endif %}
+<br><br>
+The following fields can be updated:
 </p>
 </div>
-<form action="edit/">
-    <button type="submit">Edit my profile</button>
+<form method="post">
+    {% csrf_token %}
+    {{ address_form.as_p }}
+    <!-- If this is a dealer type account, then show the dealer-specific form -->
+    {%  if user.profile.account_type == 2 %}
+        {{ dealer_form.as_p }}
+    {% endif %}
+    <p>
+        <button type="submit" name="button_element" value="Button Element">
+    Done
+        </button>
+    </p>
 </form>
 {% endblock %}
