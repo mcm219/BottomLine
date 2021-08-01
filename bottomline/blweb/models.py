@@ -4,25 +4,13 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from localflavor.us.models import USZipCodeField, USStateField
 
 
 class AccountType(Enum):
     SHOPPER = 1
     DEALER = 2
     ADMIN = 3
-
-
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    account_type = models.IntegerField(help_text="The type of account (dealer or shopper)",
-                                       default=AccountType.SHOPPER.value)
-
-
-@receiver(post_save, sender=User)
-def update_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-    instance.profile.save()
 
 
 class VehicleMake(models.Model):
@@ -69,6 +57,42 @@ class VehicleOption(models.Model):
 # but may have some unique attributes eventually (e.g. flat, metallic, matte)
 class VehicleColor(VehicleOption):
     pass
+
+
+class Address(models.Model):
+    street = models.CharField(max_length=200,
+                              help_text="The street address, e.g. 123 Main St.")
+    city = models.CharField(max_length=100,
+                            help_text="The city for this address, e.g. Farmville")
+    zip_code = USZipCodeField(help_text="The address Zip Code, e.g. 90210")
+    state = USStateField(help_text="The address state, e.g. PA")
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    account_type = models.IntegerField(help_text="The type of account (dealer or shopper)",
+                                       default=AccountType.SHOPPER.value)
+    address = models.ForeignKey(Address,
+                                on_delete=models.CASCADE,
+                                default=None,
+                                null=True,
+                                blank=True,
+                                help_text="The US mailing address associated with this account (optional)")
+
+    # Note: Only applies for AccountType.DEALER accounts
+    dealer_make = models.ForeignKey(VehicleMake,
+                                    on_delete=models.CASCADE,
+                                    default=None,
+                                    null=True,
+                                    blank=True,
+                                    help_text="The vehicle make associated with this dealer")
+
+
+@receiver(post_save, sender=User)
+def update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+    instance.profile.save()
 
 
 # VehicleConfig class. Models the build a user would put together on the site.
