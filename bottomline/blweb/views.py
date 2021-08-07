@@ -237,6 +237,10 @@ def vehicle_config_options(request):
                 # get the actual object from the key
                 veh_config = VehicleConfig.objects.get(pk=veh_config_id)
 
+                # get the user (if logged in)
+                if request.user.is_authenticated:
+                    veh_config.user = request.user
+
                 # get the options from the form
                 options = options_form.cleaned_data.get('options')
 
@@ -296,3 +300,15 @@ def vehicle_config_complete(request):
     else:
         context = {}
     return render(request, 'vehicle_config_complete.html', context)
+
+
+@login_required
+def view_configs(request):
+    context = {}
+
+    # get the list of configs for this user
+    configs = VehicleConfig.objects.filter(user=request.user)
+
+    context = {'configs': configs}
+
+    return render(request, 'view_configs.html', context)
