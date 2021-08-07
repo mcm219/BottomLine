@@ -285,15 +285,14 @@ def vehicle_config_options(request):
 def vehicle_config_complete(request):
     # handle the case where the session key is not set.
     # check to see if a param was passed in via GET
-    if request.GET:
+    try:
+        veh_config_id = request.GET['config_id']
+    except KeyError:
         try:
-            veh_config_id = request.GET['config_id']
+            veh_config_id = request.session.get("vehicle_config", None)
         except KeyError:
-            try:
-                veh_config_id = request.session.get("vehicle_config", None)
-            except KeyError:
-                # redirect back to the main config page
-                return HttpResponseRedirect('/vehicle_config')
+            # redirect back to the main config page
+            return HttpResponseRedirect('/vehicle_config')
 
     # remove the config from the session
     request.session.delete('vehicle_config')
