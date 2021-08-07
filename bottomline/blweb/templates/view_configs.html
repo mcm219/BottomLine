@@ -1,0 +1,24 @@
+{% extends "landing.html" %}
+{% block title %}BottomLine{% endblock %}
+{% block content %}
+<h2>Vehicle Config History for {{ request.user.username }}</h2>
+<br>
+<div>
+{%  for config in configs %}
+<p>
+<b>Config Name: {{ config.config_name }}</b><br>
+Year: {{ config.model.year }} <br>
+Make: {{ config.make }} <br>
+Model: {{ config.model }} <br>
+Color: {{ config.color }} <br>
+Options:
+<ul>
+{%  for option in config.options.all %}
+    <li>{{ option }}</li>
+{% endfor %}
+</ul>
+</p>
+{% endfor %}
+</div>
+{% endblock %}
+
