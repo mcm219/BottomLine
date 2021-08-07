@@ -283,11 +283,20 @@ def vehicle_config_options(request):
 
 
 def vehicle_config_complete(request):
-    try:
-        veh_config_id = request.session.get("vehicle_config", None)
-    except KeyError:
-        # handle the case where the session key is not set. redirect back to the main config page
-        return HttpResponseRedirect('/vehicle_config')
+    # handle the case where the session key is not set.
+    # check to see if a param was passed in via GET
+    if request.GET:
+        try:
+            veh_config_id = request.GET['config_id']
+        except KeyError:
+            try:
+                veh_config_id = request.session.get("vehicle_config", None)
+            except KeyError:
+                # redirect back to the main config page
+                return HttpResponseRedirect('/vehicle_config')
+
+    # remove the config from the session
+    request.session.delete('vehicle_config')
 
     if veh_config_id is not None:
         # get the actual object from the key
@@ -312,3 +321,20 @@ def view_configs(request):
     context = {'configs': configs}
 
     return render(request, 'view_configs.html', context)
+
+
+# takes a vehicle config and calculates the total vehicle price for that configuration,
+# including options
+def get_total_vehicle_price(config):
+    price = config.model.price
+    price += get_total_options_price()
+    return price
+
+
+# takes a vehicle config and calculates the total options price for that configuration
+def get_total_options_price(config):
+    price = 0
+    for option in VehicleOption.objects.filter(model=config.model.pk):
+        price += option.price
+
+    return price
