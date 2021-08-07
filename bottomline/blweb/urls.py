@@ -12,5 +12,6 @@ urlpatterns = [path('', views.index, name='landing'),
                path('vehicle_config_model/', views.vehicle_config_model, name='vehicle_config_model'),
                path('vehicle_config_options/', views.vehicle_config_options, name='vehicle_config_options'),
                path('vehicle_config_complete/', views.vehicle_config_complete, name='vehicle_config_complete'),
+               path('view_configs/', views.view_configs, name='view_configs'),
                ]
 
