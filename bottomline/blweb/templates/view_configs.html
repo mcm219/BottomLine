@@ -6,7 +6,7 @@
 <div>
 {%  for config in configs %}
 <p>
-<b>Config Name: {{ config.config_name }}</b><br>
+    <a href="/vehicle_config_complete/?config_id={{ config.pk }}"><b>Config Name: {{ config.config_name }}</b></a><br>
 Year: {{ config.model.year }} <br>
 Make: {{ config.make }} <br>
 Model: {{ config.model }} <br>
